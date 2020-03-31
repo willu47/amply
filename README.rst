@@ -1,7 +1,6 @@
 Amply
 ======
 
-
 Introduction
 ------------
 
@@ -19,9 +18,9 @@ Declarations and data statements
 
 Typically, problems expressed in AMPL consist of two parts, a *model* section and a *data* section.
 Amply is only designed to parse the parameter and set statements contained within AMPL data sections.
-However, in order to parse these statements correctly, information that would usually be contained 
+However, in order to parse these statements correctly, information that would usually be contained
 within the model section may be required. For instance, it may not be possible to infer the dimension
-of a set purely from its data statement. Therefore, Amply also supports set and parameter declarations. 
+of a set purely from its data statement. Therefore, Amply also supports set and parameter declarations.
 These do not have to be put in a separate section, they only need to occur before the corresponding
 data statement.
 
@@ -45,7 +44,7 @@ AMPL reference manual. For more in depth coverage see the `GNU MathProg manual, 
 Quickstart Guide
 ----------------
 
-.. testsetup:: 
+.. testsetup::
 
   >>> from pulp import Amply
 
@@ -76,7 +75,7 @@ A simple set. Sets behave a lot like lists.
 Data can be integers, reals, symbolic, or quoted strings:
 
 .. doctest::
-  
+
   >>> data = Amply("""
   ...   set BitsNPieces := 0 3.2 -6e4 Hello "Hello, World!";
   ... """)
@@ -113,7 +112,7 @@ Amply does not perform any validation on subscripts, it only uses them to figure
 how many subscripts a set has. To specify more than one, separate them by commas:
 
 .. doctest::
-  
+
   >>> data = Amply("""
   ... set SUBURBS{COUNTRIES, CITIES};
   ... set SUBURBS[Australia, Melbourne] := Docklands 'South Wharf' Kensington;
@@ -135,7 +134,7 @@ how many subscripts a set has. To specify more than one, separate them by commas
 
 Set data can also be specified using a matrix notation.
 A '+' indicates that the pair is included in the set whereas a '-' indicates a
-pair not in the set. 
+pair not in the set.
 
 .. doctest::
 
@@ -149,7 +148,7 @@ pair not in the set.
   >>> print data.ROUTES
   <SetObject: [('E', 'A'), ('E', 'D'), ('F', 'A'), ('F', 'B')]>
 
-Matrices can also be transposed: 
+Matrices can also be transposed:
 
 .. doctest::
 
@@ -196,7 +195,7 @@ Parameters are also supported:
   30
   >>> print data.n
   5
-   
+
 Parameters are commonly indexed over sets. No validation is done by Amply,
 and the sets do not have to exist. Parameter objects are represented
 as a mapping.
@@ -318,8 +317,8 @@ Tabular data can also be transposed:
   ... """)
   >>> print data.COSTS
   <ParamObject: {'Wellington': {'FISH': 4.0, 'CHIPS': 1.0}, 'Auckland': {'FISH': 5.0, 'CHIPS': 3.0}}>
-   
-   
+
+
 Slices can be combined with tabular data for parameters indexed over more than
 2 sets:
 
@@ -411,7 +410,7 @@ external files. ::
         subscript_domain: "{" `name` ("," `name`)* "}"
 
     The following statment declares a set named "countries". ::
-        
+
         set countries;
 
     The following statement declares a set named "cities" which is indexed over "countries". ::
@@ -442,11 +441,11 @@ external files. ::
         simple_data: `data` ([","] `data`)*
 
     For instance: ::
-        
+
         set CITIES := Auckland Hamilton 'Palmerston North' Wellington;
 
     ::
-        
+
         set ROUTES dimen 2;
         set ROUTES := (Auckland, Hamilton) (Auckland, Wellington);
 
@@ -455,7 +454,7 @@ external files. ::
 
     Slice records are used to simplify the entry of multi-dimensional sets. They allow you to partially
     specify the values of elements. A slice affects all data records that follow it (until a new slice
-    is specified). 
+    is specified).
 
     .. productionlist::
         set_slice_record: "(" `set_slice_component` ("," `set_slice_component`)* ")"

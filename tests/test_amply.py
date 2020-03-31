@@ -1,4 +1,4 @@
-import pulp.amply as amply
+from amply import amply
 from io import StringIO
 import unittest
 
