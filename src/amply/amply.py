@@ -65,8 +65,10 @@ except ImportError:
 else:
     from pyparsing import alphas, nums, alphanums, delimitedList, oneOf
     from pyparsing import Combine, Dict, Forward, Group, Literal, NotAny, Keyword
-    from pyparsing import OneOrMore, Optional, ParseResults, QuotedString
+    from pyparsing import OneOrMore, Optional, ParseResults, QuotedString, ParserElement
     from pyparsing import StringEnd, Suppress, Word, ZeroOrMore, SkipTo, lineEnd
+
+    ParserElement.enablePackrat()
 
     from itertools import chain
 
