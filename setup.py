@@ -6,7 +6,7 @@ setup(
 
     # Project uses reStructuredText, so ensure that the docutils get
     # installed or upgraded on the target machine
-    install_requires=["docutils>=0.3"],
+    install_requires=["docutils>=0.3", "pyparsing"],
     package_dir={"": "src"},
     package_data={
         # If any package contains *.txt or *.rst files, include them:
