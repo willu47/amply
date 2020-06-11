@@ -1,0 +1,5 @@
+Amply is a Python package which can be installed by PyPI using Pip.
+
+For example:
+
+    pip install amply

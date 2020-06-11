@@ -46,11 +46,11 @@ Quickstart Guide
 
 .. testsetup::
 
-  >>> from pulp import Amply
+  >>> from amply import Amply
 
 Import the class: ::
 
-  >>> from pulp import Amply
+  >>> from amply import Amply
 
 A simple set. Sets behave a lot like lists.
 
