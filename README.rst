@@ -36,7 +36,7 @@ About this document
 
 This document is intended as a guide to the syntax supported by Amply, and not as a general
 AMPL reference manual. For more in depth coverage see the `GNU MathProg manual, Chapter 5: Model data
-<http://www.cs.unb.ca/~bremner/docs/glpk/gmpl.pdf>`_ or the following links:
+<http://gusek.sourceforge.net/gmpl.pdf>`_ or the following links:
 
 * `Sets in AMPL <http://twiki.esc.auckland.ac.nz/twiki/bin/view/OpsRes/SetsInAMPL>`_
 * `Parameters in AMPL <http://twiki.esc.auckland.ac.nz/twiki/bin/view/OpsRes/ParametersInAMPL>`_
