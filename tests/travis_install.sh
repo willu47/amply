@@ -48,7 +48,6 @@ if [[ "$COVERAGE" == "true" ]]; then
     pip install -U pytest-cov pytest-virtualenv coverage coveralls flake8 pre-commit
 fi
 
-
 travis-cleanup() {
     printf "Cleaning up environments ... "  # printf avoids new lines
     if [[ "$DISTRIB" == "conda" ]]; then
