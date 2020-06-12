@@ -3,6 +3,7 @@ __pycache__
 *.pyc
 .pytest*
 Amply.egg-info
+.pypirc
 
 # Editors
 .vscode
