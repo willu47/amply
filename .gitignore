@@ -4,6 +4,8 @@ __pycache__
 .pytest*
 Amply.egg-info
 .pypirc
+build/
+dist/
 
 # Editors
 .vscode
