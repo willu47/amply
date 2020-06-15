@@ -487,3 +487,9 @@ external files. ::
 
     Tabbing Data
     ~~~~~~~~~~~~~~
+
+Development Notes
+-----------------
+
+Many thanks to Johannes Ragam (@thet), former custodian of the "amply" project on PyPi.
+Johannes graciously transferred the project to this. Thanks!
