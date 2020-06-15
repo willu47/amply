@@ -1,3 +1,3 @@
-from .amply import Amply
+from .amply import Amply, AmplyError
 
-__all__ = ["Amply"]
+__all__ = ['Amply', 'AmplyError']
