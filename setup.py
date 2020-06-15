@@ -10,7 +10,7 @@ with open("AUTHORS", "r") as fh:
         authors.append(author.split("<")[0].strip())
 
 setup(
-    name="Amply",
+    name="amply",
     version="0.1",
     packages=find_packages("src"),
     license='Eclipse Public License 1.0 (EPL-1.0)',
@@ -28,8 +28,8 @@ setup(
     author=",".join(authors),
     author_email="wusher@kth.se",
     description="Amply allows you to load and manipulate AMPL/GLPK data as Python data structures",
+    long_description_content_type="text/x-rst",
     long_description=long_description,
-    long_description_type="text/x-rst",
     keywords="ampl gmpl",
     url="http://github.com/willu47/amply",   # project home page, if any
     project_urls={

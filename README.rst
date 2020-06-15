@@ -44,8 +44,6 @@ AMPL reference manual. For more in depth coverage see the `GNU MathProg manual, 
 Quickstart Guide
 ----------------
 
-.. testsetup::
-
   >>> from amply import Amply
 
 Import the class: ::
@@ -53,8 +51,6 @@ Import the class: ::
   >>> from amply import Amply
 
 A simple set. Sets behave a lot like lists.
-
-.. doctest::
 
   >>> data = Amply("set CITIES := Auckland Wellington Christchurch;")
   >>> print data.CITIES
@@ -74,8 +70,6 @@ A simple set. Sets behave a lot like lists.
 
 Data can be integers, reals, symbolic, or quoted strings:
 
-.. doctest::
-
   >>> data = Amply("""
   ...   set BitsNPieces := 0 3.2 -6e4 Hello "Hello, World!";
   ... """)
@@ -83,8 +77,6 @@ Data can be integers, reals, symbolic, or quoted strings:
   <SetObject: [0.0, 3.2000000000000002, -60000.0, 'Hello', 'Hello, World!']>
 
 Sets can contain multidimensional data, but we have to declare them to be so first.
-
-.. doctest::
 
   >>> data = Amply("""
   ... set pairs dimen 2;
@@ -94,8 +86,6 @@ Sets can contain multidimensional data, but we have to declare them to be so fir
   <SetObject: [(1, 2), (2, 3), (3, 4)]>
 
 Sets themselves can be multidimensional (i.e. be subscriptable):
-
-.. doctest::
 
   >>> data = Amply("""
   ... set CITIES{COUNTRIES};
@@ -111,8 +101,6 @@ Note that in the above example, the set COUNTRIES didn't actually have to exist 
 Amply does not perform any validation on subscripts, it only uses them to figure out
 how many subscripts a set has. To specify more than one, separate them by commas:
 
-.. doctest::
-
   >>> data = Amply("""
   ... set SUBURBS{COUNTRIES, CITIES};
   ... set SUBURBS[Australia, Melbourne] := Docklands 'South Wharf' Kensington;
@@ -121,8 +109,6 @@ how many subscripts a set has. To specify more than one, separate them by commas
   ['Docklands', 'South Wharf', 'Kensington']
 
 *Slices* can be used to simplify the entry of multi-dimensional data.
-
-.. doctest::
 
   >>> data=Amply("""
   ... set TRIPLES dimen 3;
@@ -136,8 +122,6 @@ Set data can also be specified using a matrix notation.
 A '+' indicates that the pair is included in the set whereas a '-' indicates a
 pair not in the set.
 
-.. doctest::
-
   >>> data=Amply("""
   ... set ROUTES dimen 2;
   ... set ROUTES : A B C D :=
@@ -149,8 +133,6 @@ pair not in the set.
   <SetObject: [('E', 'A'), ('E', 'D'), ('F', 'A'), ('F', 'B')]>
 
 Matrices can also be transposed:
-
-.. doctest::
 
   >>> data=Amply("""
   ... set ROUTES dimen 2;
@@ -166,8 +148,6 @@ Matrices can also be transposed:
 
 Matrices only specify 2d data, however they can be combined with slices
 to define higher-dimensional data:
-
-.. doctest::
 
   >>> data = Amply("""
   ... set QUADS dimen 2;
@@ -185,8 +165,6 @@ to define higher-dimensional data:
 
 Parameters are also supported:
 
-.. doctest::
-
   >>> data = Amply("""
   ... param T := 30;
   ... param n := 5;
@@ -199,8 +177,6 @@ Parameters are also supported:
 Parameters are commonly indexed over sets. No validation is done by Amply,
 and the sets do not have to exist. Parameter objects are represented
 as a mapping.
-
-.. doctest::
 
   >>> data = Amply("""
   ... param COSTS{PRODUCTS};
@@ -218,8 +194,6 @@ as a mapping.
 Parameter data statements can include a *default* clause. If a '.' is included
 in the data, it is replaced with the default value:
 
-.. doctest::
-
   >>> data = Amply("""
   ... param COSTS{P};
   ... param COSTS default 2 :=
@@ -235,8 +209,6 @@ Parameter declarations can also have a default clause. For these parameters,
 any attempt to access the parameter for a key that has not been defined
 will return the default value:
 
-.. doctest::
-
   >>> data = Amply("""
   ... param COSTS{P} default 42;
   ... param COSTS :=
@@ -250,8 +222,6 @@ will return the default value:
 Parameters can be indexed over multiple sets. The resulting values can be
 accessed by treating the parameter object as a nested dictionary, or by
 using a tuple as an index:
-
-.. doctest::
 
   >>> data = Amply("""
   ... param COSTS{CITIES, PRODUCTS};
@@ -270,8 +240,6 @@ using a tuple as an index:
   1.0
 
 Parameters support a slice syntax similar to that of sets:
-
-.. doctest::
 
   >>> data = Amply("""
   ... param COSTS{CITIES, PRODUCTS};
@@ -292,8 +260,6 @@ Parameters support a slice syntax similar to that of sets:
 Parameters indexed over two sets can also be specified in tabular format:
 
 
-.. doctest::
-
   >>> data = Amply("""
   ... param COSTS{CITIES, PRODUCTS};
   ... param COSTS: FISH CHIPS :=
@@ -305,8 +271,6 @@ Parameters indexed over two sets can also be specified in tabular format:
   <ParamObject: {'Wellington': {'FISH': 4.0, 'CHIPS': 1.0}, 'Auckland': {'FISH': 5.0, 'CHIPS': 3.0}}>
 
 Tabular data can also be transposed:
-
-.. doctest::
 
   >>> data = Amply("""
   ... param COSTS{CITIES, PRODUCTS};
@@ -321,8 +285,6 @@ Tabular data can also be transposed:
 
 Slices can be combined with tabular data for parameters indexed over more than
 2 sets:
-
-.. doctest::
 
   >>> data = Amply("""
   ... param COSTS{CITIES, PRODUCTS, SIZE};
@@ -346,15 +308,15 @@ All functionality is contained within the ``Amply`` class.
 
 .. class:: Amply(string="")
 
-  .. method:: load_string(string)
+  load_string(string)
 
     Parse string data.
 
-  .. method:: load_file(file)
+  load_file(file)
 
     Parse contents of file or file-like object (has a read() method).
 
-  .. staticmethod:: from_file(file)
+  from_file(file)
 
     Alternate constructor. Create Amply object from contents of file or file-like object.
 
@@ -525,6 +487,3 @@ external files. ::
 
     Tabbing Data
     ~~~~~~~~~~~~~~
-
-
-
