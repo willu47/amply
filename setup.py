@@ -11,10 +11,10 @@ with open("AUTHORS", "r") as fh:
 
 setup(
     name="amply",
-    version="0.1",
     packages=find_packages("src"),
     license='Eclipse Public License 1.0 (EPL-1.0)',
-
+    use_scm_version=True,
+    setup_requires=['setuptools_scm'],
     # Project uses reStructuredText, so ensure that the docutils get
     # installed or upgraded on the target machine
     install_requires=["docutils>=0.3", "pyparsing"],
