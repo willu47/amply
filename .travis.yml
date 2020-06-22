@@ -6,6 +6,7 @@ virtualenv:
 jobs:
   fast_finish: true
   include:
+  - env: DISTRIB="conda" PYTHON_VERSION="3.3" COVERAGE="false"
   - env: DISTRIB="conda" PYTHON_VERSION="3.7" COVERAGE="true"
 install:
 - source tests/travis_install.sh
