@@ -1,11 +1,15 @@
 language: python
 dist: xenial
 os: linux
+python:
+  - 2.7
+  - 3.3
 virtualenv:
   system_site_packages: false
 jobs:
   allow_failures:
-  - if: python < 3.5
+    - python: 2.7
+    - python: 3.3
   fast_finish: true
   include:
     # Ubuntu 14.04 LTS (Trusty Tahr)
