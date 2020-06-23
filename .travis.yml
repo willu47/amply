@@ -42,6 +42,7 @@ notifications:
   email: false
 deploy:
   edge: true
+  distributions: "sdist bdist_wheel"
   provider: pypi
   username: __token__
   password:
