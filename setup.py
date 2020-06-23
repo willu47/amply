@@ -14,7 +14,9 @@ setup(
     packages=find_packages("src"),
     license='Eclipse Public License 1.0 (EPL-1.0)',
     use_scm_version=True,
-    setup_requires=['setuptools_scm'],
+    setup_requires=[
+        "setuptools_scm<'3'; python_version<='3.3'"
+        "setuptools_scm'; python_version>'3.3'"],
     # Project uses reStructuredText, so ensure that the docutils get
     # installed or upgraded on the target machine
     install_requires=["docutils>=0.3", "pyparsing"],
