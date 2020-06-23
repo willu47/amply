@@ -4,6 +4,8 @@ os: linux
 virtualenv:
   system_site_packages: false
 jobs:
+  allow_failures:
+  - if: python < 3.5
   fast_finish: true
   include:
     # Ubuntu 14.04 LTS (Trusty Tahr)
