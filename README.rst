@@ -1,6 +1,12 @@
 Amply
 ======
 
+.. image:: https://travis-ci.com/willu47/amply.svg?branch=master
+    :target: https://travis-ci.com/willu47/amply
+
+.. image:: https://img.shields.io/pypi/v/amply?style=plastic
+     :alt: PyPI
+
 Introduction
 ------------
 
