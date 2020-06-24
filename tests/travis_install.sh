@@ -39,6 +39,8 @@ if [[ "$DISTRIB" == "conda" ]]; then
     conda config --add channels conda-forge
     conda create -p ./.venv --yes python=${PYTHON_VERSION} pip virtualenv pyparsing docutils
     source activate ./.venv
+else
+    echo "Don't install conda for this Python version"
 fi
 
 # for all

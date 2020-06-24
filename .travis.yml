@@ -6,7 +6,8 @@ virtualenv:
 jobs:
   fast_finish: true
   include:
-  - env: DISTRIB="conda" PYTHON_VERSION="3.7" COVERAGE="true"
+  - name: conda_python3.7
+    env: DISTRIB="conda" PYTHON_VERSION="3.7" COVERAGE="true"
 install:
 - source tests/travis_install.sh
 before_script:
@@ -32,6 +33,7 @@ notifications:
   email: false
 deploy:
   edge: true
+  distributions: "sdist bdist_wheel"
   provider: pypi
   username: __token__
   password:
