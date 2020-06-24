@@ -1,26 +1,11 @@
 language: python
 dist: xenial
 os: linux
-python:
-  - 2.7
-  - 3.3
 virtualenv:
   system_site_packages: false
 jobs:
-  allow_failures:
-    - python: 2.7
-    - python: 3.3
   fast_finish: true
   include:
-    # Ubuntu 14.04 LTS (Trusty Tahr)
-  - name: python2.7
-    python: 2.7
-    dist: trusty
-    env: DISTRIB="skip" PYTHON_VERSION="2.7" COVERAGE="false"
-  - name: python3.3
-    python: 3.3
-    dist: trusty
-    env: DISTRIB="skip" PYTHON_VERSION="3.3" COVERAGE="false"
   - name: conda_python3.7
     env: DISTRIB="conda" PYTHON_VERSION="3.7" COVERAGE="true"
 install:
