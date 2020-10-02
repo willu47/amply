@@ -1,6 +1,130 @@
 from amply import amply
 from io import StringIO
 import unittest
+import pytest
+from amply.amply import (symbol, param_stmt, set_stmt,
+                         set_record, data, number,
+                         simple_data, _set_record, single)
+
+
+class TestNumber:
+
+    def test_not_number(self):
+        fixture = """
+        one
+        _
+        1e
+        e2
+        +
+        Jan
+        01Jan
+        Jan_01
+        01_Jan
+        """
+        result = number.runTests(fixture, failureTests=True)
+        assert result[0]
+
+    def test_number(self):
+        fixture = """
+        1
+        1.1
+        0.234
+        +1e-049
+        2
+        00
+        0.0
+        """
+        result = number.runTests(fixture)
+        assert result[0]
+
+class TestSymbol():
+
+    def test_not_symbol(self):
+        fixture = """
+        1.1
+        0.234
+        +1e-049
+        skj!adfk
+        __12
+        """
+        result = symbol.runTests(fixture, failureTests=True)
+        assert result[0]
+
+    def test_symbol(self):
+        fixture = """
+        Jan
+
+        01Jan
+
+        Jan_01
+
+        01_Jan
+        """
+        result = symbol.runTests(fixture)
+        assert result[0]
+
+class TestParameter():
+
+    def test_param_stmt(self):
+        fixture = """
+        param T := 4;
+
+        param T := -4;
+
+        param T := 0.04;
+
+        param T := -0.04;
+
+        param 01Jan := -0.04;
+
+        param 01_Feb := -0.04;
+        """
+        result = param_stmt.runTests(fixture)
+        assert result[0]
+
+class TestSet():
+
+    def test_set_stmt(self):
+        fixture = """
+        set month := Jan Feb Mar Apr;
+
+        set month := 01Jan 01_Feb Mar A_pr;
+
+        set 1_2_month := 1 2 3 4;
+        """
+        result = set_stmt.runTests(fixture)
+        assert result[0]
+
+    @pytest.fixture()
+    def setup(self):
+        fixture = """
+        Jan Feb Mar Apr
+
+        01Jan 01_Feb Mar A_pr
+
+        1 2 3 4
+        """
+        return fixture
+
+    def test_set_record(self, setup):
+        result = set_record.runTests(setup)
+        assert result[0]
+
+    def test_simple_data(self, setup):
+        result = simple_data.runTests(setup)
+        assert result[0]
+
+    def test_single(self):
+        fixture = """
+        01Jan
+        01
+        Jan
+        Jan_01
+        01_Jan
+        """
+        result = single.runTests(fixture)
+        assert result[0]
+
 
 class AmplyTest(unittest.TestCase):
 
@@ -26,6 +150,10 @@ class AmplyTest(unittest.TestCase):
         assert 'Jan' in result
         assert 'Foo' not in result
         assert len(result) == 4
+
+    def test_set_alphanumerical(self):
+        result = amply.Amply("set month := 01Jan 01_Feb Mar A_pr;")['month']
+        assert result == ['01Jan', '01_Feb', 'Mar', 'A_pr']
 
     def test_param(self):
         result = amply.Amply("param T := 4;")['T']
