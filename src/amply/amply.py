@@ -35,19 +35,20 @@ How it works:
     of Stmt objects, each representing a MathProg statement. The statements
     are then evaluated by calling their eval() method.
 """
+from itertools import chain
+
 try:
     import pyparsing
 except ImportError:
     pass
 else:
-    from pyparsing import alphas, nums, alphanums, delimitedList, oneOf
+    from pyparsing import alphas, nums, alphanums, delimitedList, oneOf, ParseException, printables
     from pyparsing import Combine, Dict, Forward, Group, Literal, NotAny, Keyword
     from pyparsing import OneOrMore, Optional, ParseResults, QuotedString, ParserElement
-    from pyparsing import StringEnd, Suppress, Word, ZeroOrMore, SkipTo, lineEnd
+    from pyparsing import StringEnd, Suppress, Word, ZeroOrMore, SkipTo, lineEnd, FollowedBy
 
     ParserElement.enablePackrat()
 
-    from itertools import chain
 
     __all__ = ['Amply', 'AmplyError']
 
@@ -178,7 +179,7 @@ else:
 
         def __repr__(self):
             return '<%s: %s[%s] = %s>' % (self.__class__.__name__, self.name,
-                                          self.member, self.records)
+                                            self.member, self.records)
 
         def eval(self, amply):
             if self.name in amply.symbols:
@@ -273,7 +274,7 @@ else:
 
         def __repr__(self):
             return '<%s: %s = %s>' % (self.__class__.__name__, self.name,
-                                      self.records)
+                                        self.records)
 
         def eval(self, amply):
             if self.name in amply.symbols:
@@ -358,7 +359,7 @@ else:
                     obj = amply.symbols[param_name]
                 else:
                     raise AmplyError("Param %s not previously defined" %
-                                     param_name)
+                                        param_name)
 
                 for subs, data in self._rows(obj.subscripts):
                     obj.setValue(subs, data[i])
@@ -419,8 +420,8 @@ else:
                     rec_len = len(self.free_indices) + 1
                     if len(record) % rec_len != 0:
                         raise AmplyError("Incomplete data record, expecting %d"
-                                         " subscripts per value" %
-                                         len(self.free_indices))
+                                            " subscripts per value" %
+                                            len(self.free_indices))
                     for c in chunk(record, len(self.free_indices) + 1):
                         self.setValue(c[:-1], _v(c[-1]))
                 elif isinstance(record, TabularRecord):
@@ -432,7 +433,7 @@ else:
         def _setSlice(self, slice):
             self.current_slice = list(slice.components) #copy
             self.free_indices = [i for i, v in enumerate(self.current_slice)
-                                 if v == '*']
+                                    if v == '*']
 
         def setValue(self, symbols, value):
             if value == '.':
@@ -499,7 +500,7 @@ else:
         def _setSlice(self, slice):
             self.current_slice = slice
             self.free_indices = [i for i, v in enumerate(self.current_slice)
-                                 if v == '*']
+                                    if v == '*']
 
         def _memberList(self, member):
             if member is None:
@@ -541,7 +542,7 @@ else:
                     self._addValue(data_list, c)
             else:
                 raise AmplyError("Dimension of elements (%d) does not match "
-                                 "declared dimension, (%d)" %
+                                    "declared dimension, (%d)" %
                         (inferred_dimen, self.dimen))
 
         def _addValue(self, data_list, item):
@@ -590,14 +591,13 @@ else:
 
     # What follows is a Pyparsing description of the grammar
 
-    symbol = Word(alphas, alphanums + "_")
+    symbol = Word(alphanums, bodyChars=alphanums + "_", min=1)
     sign = Optional(oneOf("+ -"))
     integer = Combine(sign + Word(nums)).setParseAction(lambda t: int(t[0]))
-    number = Combine(Word( "+-"+nums, nums) +
-                   Optional("." + Optional(Word(nums))) +
-                   Optional(oneOf("e E") + Word("+-"+nums, nums)))\
+    number = Combine(Word( "+-"+ nums, nums) +
+                    Optional("." + Optional(Word(nums))) +
+                    Optional(oneOf("e E") + Word("+-"+nums, nums)))\
             .setParseAction(lambda t: float(t[0]))
-
     LPAREN = Suppress('(')
     RPAREN = Suppress(')')
     LBRACE = Suppress('{')
@@ -609,7 +609,7 @@ else:
     PLUS = Literal('+')
     MINUS = Literal('-')
 
-    single = number | symbol | QuotedString('"') | QuotedString("'")
+    single = number ^ symbol | QuotedString('"') | QuotedString("'")
     tuple_ = Group(LPAREN + delimitedList(single) + RPAREN)
     subscript_domain = LBRACE + Group(delimitedList(symbol)) \
             .setResultsName('subscripts') + RBRACE
@@ -653,7 +653,7 @@ else:
 
     param_data = data | '.'
     plain_data = param_data | subscript + ZeroOrMore(Optional(Suppress(',')) +
-                                               subscript) + param_data
+                                                subscript) + param_data
     # should not match a single (tr)
     plain_data_record = Group(NotAny('(tr)') + plain_data + NotAny(plain_data) | \
             plain_data + OneOrMore(plain_data) + NotAny(plain_data))
@@ -742,8 +742,12 @@ else:
 
             @param string string to parse
             """
-            for obj in grammar.parseString(string):
-                obj.eval(self)
+            try:
+                for obj in grammar.parseString(string):
+                    obj.eval(self)
+            except ParseException as ex:
+                print(string)
+                raise ParseException(ex)
 
         def load_file(self, f):
             """
