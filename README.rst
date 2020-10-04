@@ -6,7 +6,7 @@ Amply
 .. image:: https://img.shields.io/pypi/v/amply?style=plastic
      :alt: PyPI
 .. image:: https://coveralls.io/repos/github/willu47/amply/badge.svg?branch=master
-:target: https://coveralls.io/github/willu47/amply?branch=master
+    :target: https://coveralls.io/github/willu47/amply?branch=master
 
 
 Introduction
