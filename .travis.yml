@@ -15,7 +15,7 @@ before_script:
 - git config --global user.name "Will Usher"
 script:
 - pip install .
-- pytest
+- pytest --cov=amply
 - |
   if [[ "$COVERAGE" == "true" ]]; then
     pre-commit install
