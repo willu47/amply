@@ -38,7 +38,7 @@ if [[ "$DISTRIB" == "conda" ]]; then
     # (prefer local venv, since the miniconda folder is cached)
     conda config --add channels conda-forge
     conda create -p ./.venv --yes python=${PYTHON_VERSION} pip virtualenv pyparsing docutils
-    conda activate ./.venv
+    source activate ./.venv
 else
     echo "Don't install conda for this Python version"
 fi
