@@ -6,15 +6,15 @@ virtualenv:
 jobs:
   fast_finish: true
   include:
-  - name: conda_python3.7
-    env: DISTRIB="conda" PYTHON_VERSION="3.7" COVERAGE="true"
+  - name: conda_python3.8
+    env: DISTRIB="conda" PYTHON_VERSION="3.8" COVERAGE="true"
 install:
 - source tests/travis_install.sh
 before_script:
 - git config --global user.email "wusher@kth.com"
 - git config --global user.name "Will Usher"
 script:
-- python setup.py install
+- pip install .
 - pytest
 - |
   if [[ "$COVERAGE" == "true" ]]; then
