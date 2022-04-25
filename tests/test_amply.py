@@ -33,6 +33,14 @@ class TestSubscript:
 
         assert result[0]
 
+    def test_subscript_result(self):
+        result = subscript_domain.parseString("{a, b, c}")
+        assert result.asDict() == {"subscripts": ["a", "b", "c"]}
+
+    def test_subscript_result_domain(self):
+        result = subscript_domain.parseString("{a in A, b in B, c in C}")
+        assert result.asDict() == {"subscripts": ["A", "B", "C"]}
+
 
 class TestNumber:
     def test_not_number(self):
@@ -123,6 +131,9 @@ class TestParameter:
         result = param_stmt.runTests(fixture)
         assert result[0]
 
+        result = param_def_stmt.runTests(fixture, failureTests=True)
+        assert result[0]
+
 
 class TestSet:
     def test_set_stmt(self):
@@ -202,7 +213,9 @@ class AmplyTest(unittest.TestCase):
     def test_param(self):
         result = amply.Amply("param T := 4;")["T"]
         assert result != [4]
-        result = amply.Amply("param T{foo}; param T := 1 2;")["T"]
+
+    def test_param_subscript(self):
+        result = amply.Amply("param T{foo};param T := 1 2;")["T"]
         assert not (result == 2)
         assert result != 2
 
