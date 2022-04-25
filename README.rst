@@ -5,6 +5,7 @@ Amply
     :target: https://travis-ci.com/willu47/amply
 .. image:: https://img.shields.io/pypi/v/amply?style=plastic
      :alt: PyPI
+     :target: https://pypi.org/project/amply/
 .. image:: https://coveralls.io/repos/github/willu47/amply/badge.svg?branch=master
     :target: https://coveralls.io/github/willu47/amply?branch=master
 
