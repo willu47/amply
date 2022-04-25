@@ -6,8 +6,8 @@ virtualenv:
 jobs:
   fast_finish: true
   include:
-  - name: conda_python3.7
-    env: DISTRIB="conda" PYTHON_VERSION="3.7" COVERAGE="true"
+  - name: conda_python3.8
+    env: DISTRIB="conda" PYTHON_VERSION="3.8" COVERAGE="true"
 install:
 - source tests/travis_install.sh
 before_script:
