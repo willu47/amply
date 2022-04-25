@@ -397,7 +397,7 @@ class ParamDefStmt(AmplyStmt):
 
     def __init__(self, tokens):
         assert tokens[0] == "param"
-        self.name = tokens[1]
+        self.name = tokens.get("name")
         self.subscripts = tokens.get("subscripts")
         self.default = tokens.get("default", NoDefault)
 
@@ -408,7 +408,10 @@ class ParamDefStmt(AmplyStmt):
                 return 1
             return s.dimen
 
-        num_subscripts = sum(_getDimen(s) for s in self.subscripts)
+        try:
+            num_subscripts = sum(_getDimen(s) for s in self.subscripts)
+        except TypeError:
+            num_subscripts = 1
         amply._addSymbol(self.name, ParamObject(num_subscripts, self.default))
 
 
@@ -606,6 +609,7 @@ def mark_transposed(tokens):
 
 # What follows is a Pyparsing description of the grammar
 
+index = Word(alphanums, exact=1)
 symbol = Word(alphanums, bodyChars=alphanums + "_", min=1)
 sign = Optional(oneOf("+ -"))
 integer = Combine(sign + Word(nums)).setParseAction(lambda t: int(t[0]))
@@ -614,6 +618,7 @@ number = Combine(
     + Optional("." + Optional(Word(nums)))
     + Optional(oneOf("e E") + Word("+-" + nums, nums))
 ).setParseAction(lambda t: float(t[0]))
+
 LPAREN = Suppress("(")
 RPAREN = Suppress(")")
 LBRACE = Suppress("{")
@@ -625,10 +630,19 @@ END = Suppress(";")
 PLUS = Literal("+")
 MINUS = Literal("-")
 
+# Keywords
+KW_PARAM = Keyword("param")
+KW_SET = Keyword("set")
+KW_DEFAULT = Keyword("default")
+
 single = number ^ symbol | QuotedString('"') | QuotedString("'")
 tuple_ = Group(LPAREN + delimitedList(single) + RPAREN)
+
+domain_index = Suppress(index + Keyword("in"))
 subscript_domain = (
-    LBRACE + Group(delimitedList(symbol)).setResultsName("subscripts") + RBRACE
+    LBRACE
+    + delimitedList(Optional(domain_index) + symbol).setResultsName("subscripts")
+    + RBRACE
 )
 
 data = single | tuple_
@@ -660,7 +674,7 @@ set_record = simple_data | _set_record
 non_dimen_set_record = non_dimen_simple_data | _set_record
 
 set_def_stmt = (
-    Keyword("set")
+    KW_SET
     + symbol
     + Optional(subscript_domain)
     + Optional(Keyword("dimen") + integer.setResultsName("dimen"))
@@ -671,7 +685,7 @@ set_def_stmt.setParseAction(SetDefStmt)
 set_member = LBRACKET + delimitedList(data) + RBRACKET
 
 set_stmt = (
-    Keyword("set")
+    KW_SET
     + symbol
     + Optional(set_member).setResultsName("member")
     + Group(
@@ -717,11 +731,11 @@ param_record = (
     | Suppress(":=")
 )
 
-param_default = Optional(Keyword("default") + single.setResultsName("default"))
+param_default = Optional(KW_DEFAULT + single.setResultsName("default"))
 
 param_stmt = (
-    Keyword("param")
-    + ~Keyword("default")
+    KW_PARAM
+    + ~KW_DEFAULT
     + symbol.setResultsName("name")
     + param_default
     + Group(OneOrMore(param_record)).setResultsName("records")
@@ -730,7 +744,7 @@ param_stmt = (
 param_stmt.setParseAction(ParamStmt)
 
 param_tabbing_stmt = (
-    Keyword("param")
+    KW_PARAM
     + param_default
     + ":"
     + Optional(symbol + ": ")
@@ -742,11 +756,15 @@ param_tabbing_stmt = (
 param_tabbing_stmt.setParseAction(ParamTabbingStmt)
 
 param_def_stmt = (
-    Keyword("param") + symbol + Optional(subscript_domain) + param_default + END
+    KW_PARAM
+    + symbol.setResultsName("name")
+    + Optional(subscript_domain)
+    + param_default
+    + END
 )
 param_def_stmt.setParseAction(ParamDefStmt)
 
-stmts = set_stmt | set_def_stmt | param_stmt | param_def_stmt | param_tabbing_stmt
+stmts = set_stmt | set_def_stmt | param_def_stmt | param_stmt | param_tabbing_stmt
 grammar = ZeroOrMore(stmts) + StringEnd()
 grammar.ignore("#" + SkipTo(lineEnd))
 grammar.ignore("end;" + SkipTo(lineEnd))
@@ -778,7 +796,7 @@ class Amply(object):
 
     def __getattr__(self, name):
         """
-        Override so that symbols can be accesed as attributes
+        Override so that symbols can be accessed as attributes
         """
         if name in self.symbols:
             return self.symbols[name]
@@ -824,3 +842,8 @@ class Amply(object):
         @param f file-like object
         """
         return Amply(f.read())
+
+
+if __name__ == "__main__":
+
+    grammar.create_diagram("parser_rr_diag.html")
