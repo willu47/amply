@@ -1,14 +1,40 @@
-from amply import amply
-from io import StringIO
 import unittest
+from io import StringIO
+
 import pytest
-from amply.amply import (symbol, param_stmt, set_stmt,
-                         set_record, data, number,
-                         simple_data, _set_record, single)
+
+from amply import amply
+from amply.amply import (
+    number,
+    param_def_stmt,
+    param_stmt,
+    set_record,
+    set_stmt,
+    simple_data,
+    single,
+    subscript_domain,
+    symbol,
+)
+
+
+class TestSubscript:
+    def test_subscript(self):
+        fixture = """
+        {a, b, c}
+        {enum}
+        {REGION, YEAR}
+        {REGION, TECHNOLOGY, YEAR}
+        {r in REGION}
+        {r in REGION, y in YEAR, g in GOLF}
+
+        """
+        success, result = subscript_domain.runTests(fixture)
+        assert success
+
+        assert result[0]
 
 
 class TestNumber:
-
     def test_not_number(self):
         fixture = """
         one
@@ -37,8 +63,8 @@ class TestNumber:
         result = number.runTests(fixture)
         assert result[0]
 
-class TestSymbol():
 
+class TestSymbol:
     def test_not_symbol(self):
         fixture = """
         1.1
@@ -63,7 +89,21 @@ class TestSymbol():
         result = symbol.runTests(fixture)
         assert result[0]
 
-class TestParameter():
+
+class TestParameter:
+    def test_param_def(self):
+        fixture = """
+        param Test{r in REGION, y in YEAR, g in GOLF};
+        param square {x, y};
+        param Test;
+        param Test default 1;
+        """
+        success, results = param_def_stmt.runTests(fixture)
+
+        assert success
+
+        success, _ = param_stmt.runTests(fixture, failureTests=True)
+        assert success
 
     def test_param_stmt(self):
         fixture = """
@@ -78,12 +118,13 @@ class TestParameter():
         param 01Jan := -0.04;
 
         param 01_Feb := -0.04;
+
         """
         result = param_stmt.runTests(fixture)
         assert result[0]
 
-class TestSet():
 
+class TestSet:
     def test_set_stmt(self):
         fixture = """
         set month := Jan Feb Mar Apr;
@@ -127,40 +168,43 @@ class TestSet():
 
 
 class AmplyTest(unittest.TestCase):
-
     def test_data(self):
-        result = amply.Amply("param T := 4;")['T']
+        result = amply.Amply("param T := 4;")["T"]
         assert result == 4
-        result = amply.Amply("param T := -4;")['T']
+        result = amply.Amply("param T := -4;")["T"]
         assert result == -4
-        result = amply.Amply("param T := 0.04;")['T']
+        result = amply.Amply("param T := 0.04;")["T"]
         assert result == 0.04
-        result = amply.Amply("param T := -0.04;")['T']
+        result = amply.Amply("param T := -0.04;")["T"]
         assert result == -0.04
 
     def test_set(self):
-        result = amply.Amply("set month := Jan Feb Mar Apr;")['month']
-        assert result == ['Jan', 'Feb', 'Mar', 'Apr']
+        result = amply.Amply("set month := Jan Feb Mar Apr;")["month"]
+        assert result == ["Jan", "Feb", "Mar", "Apr"]
 
-        result = amply.Amply("set month Jan Feb Mar Apr;")['month']
-        assert result == ['Jan', 'Feb', 'Mar', 'Apr']
-        assert [i for i in result] == ['Jan', 'Feb', 'Mar', 'Apr']
+        result = amply.Amply("set month Jan Feb Mar Apr;")["month"]
+        assert result == ["Jan", "Feb", "Mar", "Apr"]
+        assert [i for i in result] == ["Jan", "Feb", "Mar", "Apr"]
         assert result != []
 
-        assert 'Jan' in result
-        assert 'Foo' not in result
+        assert "Jan" in result
+        assert "Foo" not in result
         assert len(result) == 4
 
     def test_set_alphanumerical(self):
-        result = amply.Amply("set month := 01Jan 01_Feb Mar A_pr;")['month']
-        assert result == ['01Jan', '01_Feb', 'Mar', 'A_pr']
+        result = amply.Amply("set month := 01Jan 01_Feb Mar A_pr;")["month"]
+        assert result == ["01Jan", "01_Feb", "Mar", "A_pr"]
+
+    def test_param_definition(self):
+        result = amply.Amply("param T;")
+        assert result != [4]
 
     def test_param(self):
-        result = amply.Amply("param T := 4;")['T']
+        result = amply.Amply("param T := 4;")["T"]
         assert result != [4]
-        result = amply.Amply("param T{foo}; param T := 1 2;")['T']
+        result = amply.Amply("param T{foo}; param T := 1 2;")["T"]
         assert not (result == 2)
-        assert (result != 2)
+        assert result != 2
 
     def test_attr_access(self):
         result = amply.Amply("param T:= 4;").T
@@ -202,7 +246,7 @@ class AmplyTest(unittest.TestCase):
             set twotups dimen 2;
             set twotups := (1, 2) (2, 3) (4, 2) (3, 1);
             """
-        )['twotups']
+        )["twotups"]
         assert result == [(1, 2), (2, 3), (4, 2), (3, 1)]
 
     def test_set_dimen_error(self):
@@ -218,7 +262,7 @@ class AmplyTest(unittest.TestCase):
             set twotups dimen 2;
             set twotups := 1 2 2 3 4 2 3 1;
             """
-        )['twotups']
+        )["twotups"]
         assert result == [(1, 2), (2, 3), (4, 2), (3, 1)]
 
     def test_set_subscript(self):
@@ -228,10 +272,10 @@ class AmplyTest(unittest.TestCase):
             set days[Jan] := 1 2 3 4;
             set days[Feb] := 5 6 7 8;
             """
-        )['days']
-        j = result['Jan']
+        )["days"]
+        j = result["Jan"]
         assert j == [1, 2, 3, 4]
-        f = result['Feb']
+        f = result["Feb"]
         assert f == [5, 6, 7, 8]
 
     def test_set_subscript2(self):
@@ -241,10 +285,10 @@ class AmplyTest(unittest.TestCase):
             set days[Jan, 3] := 1 2 3 4;
             set days[Feb, 'Ham '] := 5 6 7 8;
             """
-        )['days']
-        j = result['Jan'][3]
+        )["days"]
+        j = result["Jan"][3]
         assert j == [1, 2, 3, 4]
-        f = result['Feb']['Ham ']
+        f = result["Feb"]["Ham "]
         assert f == [5, 6, 7, 8]
 
     def test_set_subscript2_tuples(self):
@@ -254,10 +298,10 @@ class AmplyTest(unittest.TestCase):
             set days[Jan, 3] := 1 2 3 4;
             set days[Feb, 'Ham '] := 5 6 7 8;
             """
-        )['days']
-        j = result['Jan', 3]
+        )["days"]
+        j = result["Jan", 3]
         assert j == [1, 2, 3, 4]
-        f = result['Feb', 'Ham ']
+        f = result["Feb", "Ham "]
         assert f == [5, 6, 7, 8]
 
     def test_set_matrix(self):
@@ -312,14 +356,19 @@ class AmplyTest(unittest.TestCase):
             """
         )
         a = result.A
-        assert a == [(1,1,1),(1,2,1),(1,2,3),(2,1,1),(2,1,3),(2,2,2),
-                     (2,3,3)]
-
+        assert a == [
+            (1, 1, 1),
+            (1, 2, 1),
+            (1, 2, 3),
+            (2, 1, 1),
+            (2, 1, 3),
+            (2, 2, 2),
+            (2, 3, 3),
+        ]
 
     def test_simple_params(self):
-        result = amply.Amply("param T := 4;")['T']
+        result = amply.Amply("param T := 4;")["T"]
         assert result == 4
-
 
     def test_sub1_params(self):
         result = amply.Amply(
@@ -328,10 +377,10 @@ class AmplyTest(unittest.TestCase):
             param foo := 1 Jan 2 Feb 3 Mar;
             """
         )
-        j = result['foo'][1]
-        assert j == 'Jan'
-        f = result['foo'][2]
-        assert f == 'Feb'
+        j = result["foo"][1]
+        assert j == "Jan"
+        f = result["foo"][2]
+        assert f == "Feb"
 
     def test_sub1_param_error(self):
         a = """
@@ -347,12 +396,9 @@ class AmplyTest(unittest.TestCase):
             param foo := Jan 1 Feb 2 Mar 3;
             """
         )
-        options = [('Jan', 1),
-                   ('Mar', 3),
-                   ('FOO', 3)
-                   ]
+        options = [("Jan", 1), ("Mar", 3), ("FOO", 3)]
         for name, value in options:
-            self.assertEqual(result['foo'][name], value)
+            self.assertEqual(result["foo"][name], value)
 
     def test_param_undefined(self):
         result = amply.Amply(
@@ -361,10 +407,10 @@ class AmplyTest(unittest.TestCase):
             param foo := Jan 1 Feb 2 Mar 3;
             """
         )
-        j = result['foo']['Jan']
+        j = result["foo"]["Jan"]
         assert j == 1
         with self.assertRaises(KeyError):
-            a = result['foo']['Apr']
+            result["foo"]["Apr"]
 
     def test_sub2_params(self):
         result = amply.Amply(
@@ -373,9 +419,9 @@ class AmplyTest(unittest.TestCase):
             param foo := 1 2 Hi 99 3 4;
             """
         )
-        h = result['foo'][1][2]
-        assert h == 'Hi'
-        f = result['foo'][99][3]
+        h = result["foo"][1][2]
+        assert h == "Hi"
+        f = result["foo"][99][3]
         assert f == 4
 
     def test_2d_param(self):
@@ -388,12 +434,13 @@ class AmplyTest(unittest.TestCase):
             plates  30  120 90
             cups    666 13  29 ;
             """
-        )['demand']
+        )["demand"]
 
-        options = [('spoons', { 'FRA': 200, 'DET': 100, 'LAN': 30 }),
-                   ('plates', { 'FRA': 30, 'DET': 120, 'LAN': 90 }),
-                   ('cups', { 'FRA': 666, 'DET': 13, 'LAN': 29 })
-                   ]
+        options = [
+            ("spoons", {"FRA": 200, "DET": 100, "LAN": 30}),
+            ("plates", {"FRA": 30, "DET": 120, "LAN": 90}),
+            ("cups", {"FRA": 666, "DET": 13, "LAN": 29}),
+        ]
         for name, _dict in options:
             self.assertDictEqual(result[name], _dict)
 
@@ -406,7 +453,7 @@ class AmplyTest(unittest.TestCase):
                 3       3   6
             ;
             """
-        )['square']
+        )["square"]
         f = result[4, 1]
         assert f == 4
         assert result[4, 2] == 8
@@ -423,12 +470,13 @@ class AmplyTest(unittest.TestCase):
             plates  30  120 .
             cups    . .  29 ;
             """
-        )['demand']
+        )["demand"]
 
-        options = [('spoons', { 'FRA': 200, 'DET': 42, 'LAN': 30 }),
-                   ('plates', { 'FRA': 30, 'DET': 120, 'LAN': 42 }),
-                   ('cups', { 'FRA': 42, 'DET': 42, 'LAN': 29 })
-                   ]
+        options = [
+            ("spoons", {"FRA": 200, "DET": 42, "LAN": 30}),
+            ("plates", {"FRA": 30, "DET": 120, "LAN": 42}),
+            ("cups", {"FRA": 42, "DET": 42, "LAN": 29}),
+        ]
         for name, _dict in options:
             self.assertDictEqual(result[name], _dict)
 
@@ -451,18 +499,20 @@ class AmplyTest(unittest.TestCase):
             ;
             """
         )
-        demand = result['demand']
-        options = [('spoons', { 'FRA': 200, 'DET': 42, 'LAN': 30 }),
-                   ('plates', { 'FRA': 30, 'DET': 120, 'LAN': 42 }),
-                   ('cups', { 'FRA': 42, 'DET': 42, 'LAN': 29 })
-                   ]
+        demand = result["demand"]
+        options = [
+            ("spoons", {"FRA": 200, "DET": 42, "LAN": 30}),
+            ("plates", {"FRA": 30, "DET": 120, "LAN": 42}),
+            ("cups", {"FRA": 42, "DET": 42, "LAN": 29}),
+        ]
         for name, _dict in options:
             self.assertDictEqual(demand[name], _dict)
 
-        square = result['square']
-        options = [('A', {'A': 1, 'B': 6}),
-                   ('B', {'A': 6, 'B': 36}),
-                   ]
+        square = result["square"]
+        options = [
+            ("A", {"A": 1, "B": 6}),
+            ("B", {"A": 6, "B": 36}),
+        ]
         for name, _dict in options:
             self.assertDictEqual(square[name], _dict)
 
@@ -476,11 +526,11 @@ class AmplyTest(unittest.TestCase):
             plates  30  120 .
             cups    . .  29 ;
             """
-        )['demand']
+        )["demand"]
 
-        self.assertEqual(result['FRA'], { 'spoons': 200, 'plates': 30, 'cups': 42 })
-        self.assertEqual(result['DET'], { 'spoons': 42, 'plates': 120, 'cups': 42 })
-        self.assertEqual(result['LAN'], { 'spoons': 30, 'plates': 42, 'cups': 29 })
+        self.assertEqual(result["FRA"], {"spoons": 200, "plates": 30, "cups": 42})
+        self.assertEqual(result["DET"], {"spoons": 42, "plates": 120, "cups": 42})
+        self.assertEqual(result["LAN"], {"spoons": 30, "plates": 42, "cups": 29})
 
     def test_2d_slice1(self):
         result = amply.Amply(
@@ -489,10 +539,10 @@ class AmplyTest(unittest.TestCase):
             param demand :=
                 [Jan, *] Foo 1 Bar 2;
             """
-        )['demand']
-        f = result['Jan']['Foo']
+        )["demand"]
+        f = result["Jan"]["Foo"]
         assert f == 1
-        assert result['Jan']['Bar'] == 2
+        assert result["Jan"]["Bar"] == 2
 
     def test_3d_slice2(self):
         result = amply.Amply(
@@ -510,12 +560,12 @@ class AmplyTest(unittest.TestCase):
                     CLEV     29  9   13
             ;
             """
-        )['trans_cost']
+        )["trans_cost"]
 
-        f = result['GARY']['FRA']['bands']
+        f = result["GARY"]["FRA"]["bands"]
         assert f == 30
-        assert result['GARY']['DET']['plate'] == 15
-        assert result['CLEV']['LAN']['coils'] == 12
+        assert result["GARY"]["DET"]["plate"] == 15
+        assert result["CLEV"]["LAN"]["coils"] == 12
 
     def test_3d_slice2b(self):
         result = amply.Amply(
@@ -533,12 +583,27 @@ class AmplyTest(unittest.TestCase):
                     CLEV     29  9   13
             ;
             """
-        )['trans_cost']
+        )["trans_cost"]
 
-        f = result['GARY']['bands']['FRA']
+        f = result["GARY"]["bands"]["FRA"]
         assert f == 30
-        assert result['GARY']['plate']['DET'] == 15
-        assert result['CLEV']['coils']['LAN'] == 12
+        assert result["GARY"]["plate"]["DET"] == 15
+        assert result["CLEV"]["coils"]["LAN"] == 12
+
+    def test_3d_slide2c(self):
+        amply.Amply(
+            """
+            set REGION := Kenya;
+            set TECHNOLOGY := TRLV_1_0;
+            set YEAR := 2016 2017 2018 2019 2020;
+            param Peakdemand {REGION,TECHNOLOGY,YEAR};
+            param Peakdemand default 1 :=
+            [Kenya,*,*]:
+            2016 2017 2018 2019 2020 :=
+            TRLV_1_0 0 0 0 0.035503748 0.073847796
+            ;
+            """
+        )
 
     def test_single_tabbing_data(self):
         result = amply.Amply(
@@ -553,10 +618,10 @@ class AmplyTest(unittest.TestCase):
             ;
             """
         )
-        s = result['init_stock']
-        assert s == {'iron': 7, 'nickel': 35}
-        assert result['cost'] == {'iron': 25, 'nickel': 3}
-        assert result['value'] == {'iron': 1, 'nickel': 2}
+        s = result["init_stock"]
+        assert s == {"iron": 7, "nickel": 35}
+        assert result["cost"] == {"iron": 25, "nickel": 3}
+        assert result["value"] == {"iron": 1, "nickel": 2}
 
     def test_single_tabbing_data_with_set(self):
         result = amply.Amply(
@@ -571,10 +636,10 @@ class AmplyTest(unittest.TestCase):
             ;
             """
         )
-        s = result['init_stock']
-        assert s == {'iron': 7, 'nickel': 35}
-        assert result['cost'] == {'iron': 25, 'nickel': 3}
-        assert result['value'] == {'iron': 1, 'nickel': 2}
+        s = result["init_stock"]
+        assert s == {"iron": 7, "nickel": 35}
+        assert result["cost"] == {"iron": 25, "nickel": 3}
+        assert result["value"] == {"iron": 1, "nickel": 2}
 
     def test_set2_tabbing(self):
         result = amply.Amply(
@@ -590,7 +655,7 @@ class AmplyTest(unittest.TestCase):
             """
         )
 
-        assert result['elem'] == [(0,0),(1,1),(2,2)]
+        assert result["elem"] == [(0, 0), (1, 1), (2, 2)]
 
     def test_undefined_tabbing_param(self):
         a = """
@@ -613,7 +678,7 @@ class AmplyTest(unittest.TestCase):
                 3   4   5
             ;
             """
-        )['foo']
+        )["foo"]
 
         f = result[1][2]
         assert f == 3
@@ -631,12 +696,12 @@ class AmplyTest(unittest.TestCase):
                 3   4   5
             ;
             """
-        )['foo']
+        )["foo"]
 
-        f = result[1,2]
+        f = result[1, 2]
         assert f == 3
-        assert result[2,3] == 4
-        assert result[3,4] == 5
+        assert result[2, 3] == 4
+        assert result[3, 4] == 5
 
     def test_comment(self):
         result = amply.Amply(
@@ -650,12 +715,12 @@ class AmplyTest(unittest.TestCase):
                 3   4   5
             ;
             """
-        )['foo']
+        )["foo"]
 
-        f = result[1,2]
+        f = result[1, 2]
         assert f == 3
-        assert result[2,3] == 4
-        assert result[3,4] == 5
+        assert result[2, 3] == 4
+        assert result[3, 4] == 5
 
     def test_empty_tabbing_parameter_statement(self):
 
@@ -667,7 +732,7 @@ class AmplyTest(unittest.TestCase):
             ;
             """
         )
-        assert 'square' in result.symbols.keys()
+        assert "square" in result.symbols.keys()
         assert result.square == {}
 
     def test_empty_tabbing_parameters(self):
@@ -681,7 +746,7 @@ class AmplyTest(unittest.TestCase):
             ;
             """
         )
-        assert 'square' in result.symbols.keys()
+        assert "square" in result.symbols.keys()
         assert result.square == {}
 
     def test_empty_parameter_statement(self):
@@ -692,7 +757,7 @@ class AmplyTest(unittest.TestCase):
             ;
             """
         )
-        assert 'square' in result.symbols.keys()
+        assert "square" in result.symbols.keys()
         assert result.square == {}
 
     def test_high_dim_tabbing(self):
@@ -711,11 +776,11 @@ class AmplyTest(unittest.TestCase):
             ;
             """
         )
-        assert 'square' in result.symbols.keys()
-        print(result.square['b'])
-        assert result.square['a'] == {'a': 34.0, 'b': 35.0, 'c': 36.0}
-        assert result.square['b'] == {'a': 53.0, 'b': 45.3, 'c': 459.2}
+        assert "square" in result.symbols.keys()
+        print(result.square["b"])
+        assert result.square["a"] == {"a": 34.0, "b": 35.0, "c": 36.0}
+        assert result.square["b"] == {"a": 53.0, "b": 45.3, "c": 459.2}
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
