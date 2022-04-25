@@ -38,7 +38,7 @@ if [[ "$DISTRIB" == "conda" ]]; then
     # (prefer local venv, since the miniconda folder is cached)
     conda config --add channels conda-forge
     conda create -p ./.venv --yes python=${PYTHON_VERSION} pip virtualenv pyparsing docutils
-    source activate ./.venv
+    conda activate ./.venv
 else
     echo "Don't install conda for this Python version"
 fi
@@ -54,7 +54,7 @@ travis-cleanup() {
     printf "Cleaning up environments ... "  # printf avoids new lines
     if [[ "$DISTRIB" == "conda" ]]; then
         # Force the env to be recreated next time, for build consistency
-        source deactivate
+        conda deactivate
         conda remove -p ./.venv --all --yes
         rm -rf ./.venv
     fi
