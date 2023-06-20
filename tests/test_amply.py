@@ -1,7 +1,7 @@
+import pytest
+
 import unittest
 from io import StringIO
-
-import pytest
 
 from amply import amply
 from amply.amply import (
@@ -79,7 +79,6 @@ class TestSymbol:
         0.234
         +1e-049
         skj!adfk
-        __12
         """
         result = symbol.runTests(fixture, failureTests=True)
         assert result[0]
@@ -227,7 +226,7 @@ class AmplyTest(unittest.TestCase):
         try:
             s = StringIO("param T:= 4;")
         except TypeError:
-            s = StringIO(u"param T:= 4;")
+            s = StringIO("param T:= 4;")
         assert amply.Amply.from_file(s).T == 4
 
     def test_load_string(self):
@@ -242,7 +241,7 @@ class AmplyTest(unittest.TestCase):
         try:
             s = StringIO("param S := 6; param X := 1 2;")
         except TypeError:
-            s = StringIO(u"param S := 6; param X := 1 2;")
+            s = StringIO("param S := 6; param X := 1 2;")
         a.load_file(s)
         assert a.T == 4
         assert a.S == 6
