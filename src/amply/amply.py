@@ -610,7 +610,7 @@ def mark_transposed(tokens):
 # What follows is a Pyparsing description of the grammar
 
 index = Word(alphanums, exact=1)
-symbol = Word(alphanums, bodyChars=alphanums + "_", min=1)
+symbol = Word(alphanums + "_", bodyChars=alphanums + "_", min=1)
 sign = Optional(oneOf("+ -"))
 integer = Combine(sign + Word(nums)).setParseAction(lambda t: int(t[0]))
 number = Combine(
