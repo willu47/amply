@@ -8,7 +8,9 @@ Amply
      :target: https://pypi.org/project/amply/
 .. image:: https://coveralls.io/repos/github/willu47/amply/badge.svg?branch=master
     :target: https://coveralls.io/github/willu47/amply?branch=master
-
+.. image:: https://assets.piptrends.com/get-last-month-downloads-badge/amply.svg
+    :alt: amply Downloads Last Month by pip Trends
+    :target: https://piptrends.com/package/amply
 
 Introduction
 ------------
