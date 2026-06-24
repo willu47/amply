@@ -53,13 +53,13 @@ from pyparsing import (
     Word,
     ZeroOrMore,
     alphanums,
-    delimitedList,
+    DelimitedList,
     lineEnd,
     nums,
-    oneOf,
+    one_of,
 )
 
-ParserElement.enablePackrat()
+ParserElement.enable_packrat()
 
 
 __all__ = ["Amply", "AmplyError"]
@@ -610,14 +610,14 @@ def mark_transposed(tokens):
 # What follows is a Pyparsing description of the grammar
 
 index = Word(alphanums, exact=1)
-symbol = Word(alphanums + "_", bodyChars=alphanums + "_", min=1)
-sign = Optional(oneOf("+ -"))
-integer = Combine(sign + Word(nums)).setParseAction(lambda t: int(t[0]))
+symbol = Word(alphanums + "_", body_chars=alphanums + "_", min=1)
+sign = Optional(one_of("+ -"))
+integer = Combine(sign + Word(nums)).set_parse_action(lambda t: int(t[0]))
 number = Combine(
     Word("+-" + nums, nums)
     + Optional("." + Optional(Word(nums)))
-    + Optional(oneOf("e E") + Word("+-" + nums, nums))
-).setParseAction(lambda t: float(t[0]))
+    + Optional(one_of("e E") + Word("+-" + nums, nums))
+).set_parse_action(lambda t: float(t[0]))
 
 LPAREN = Suppress("(")
 RPAREN = Suppress(")")
@@ -636,12 +636,12 @@ KW_SET = Keyword("set")
 KW_DEFAULT = Keyword("default")
 
 single = number ^ symbol | QuotedString('"') | QuotedString("'")
-tuple_ = Group(LPAREN + delimitedList(single) + RPAREN)
+tuple_ = Group(LPAREN + DelimitedList(single) + RPAREN)
 
 domain_index = Suppress(index + Keyword("in"))
 subscript_domain = (
     LBRACE
-    + delimitedList(Optional(domain_index) + symbol).setResultsName("subscripts")
+    + DelimitedList(Optional(domain_index) + symbol).set_results_name("subscripts")
     + RBRACE
 )
 
@@ -656,18 +656,18 @@ non_dimen_simple_data = ~Keyword("dimen") + simple_data
 matrix_row = Group(single + OneOrMore(PLUS | MINUS))
 matrix_data = (
     ":"
-    + OneOrMore(single).setResultsName("columns")
+    + OneOrMore(single).set_results_name("columns")
     + ":="
-    + OneOrMore(matrix_row).setResultsName("data")
+    + OneOrMore(matrix_row).set_results_name("data")
 )
-matrix_data.setParseAction(MatrixData)
+matrix_data.set_parse_action(MatrixData)
 
 tr_matrix_data = Suppress("(tr)") + matrix_data
-tr_matrix_data.setParseAction(mark_transposed)
+tr_matrix_data.set_parse_action(mark_transposed)
 
 set_slice_component = number | symbol | "*"
-set_slice_record = LPAREN + NotAny("tr") + delimitedList(set_slice_component) + RPAREN
-set_slice_record.setParseAction(SliceRecord)
+set_slice_record = LPAREN + NotAny("tr") + DelimitedList(set_slice_component) + RPAREN
+set_slice_record.set_parse_action(SliceRecord)
 
 _set_record = set_slice_record | matrix_data | tr_matrix_data | Suppress(":=")
 set_record = simple_data | _set_record
@@ -677,23 +677,23 @@ set_def_stmt = (
     KW_SET
     + symbol
     + Optional(subscript_domain)
-    + Optional(Keyword("dimen") + integer.setResultsName("dimen"))
+    + Optional(Keyword("dimen") + integer.set_results_name("dimen"))
     + END
 )
-set_def_stmt.setParseAction(SetDefStmt)
+set_def_stmt.set_parse_action(SetDefStmt)
 
-set_member = LBRACKET + delimitedList(data) + RBRACKET
+set_member = LBRACKET + DelimitedList(data) + RBRACKET
 
 set_stmt = (
     KW_SET
     + symbol
-    + Optional(set_member).setResultsName("member")
+    + Optional(set_member).set_results_name("member")
     + Group(
         non_dimen_set_record + ZeroOrMore(Optional(Suppress(",")) + set_record)
-    ).setResultsName("records")
+    ).set_results_name("records")
     + END
 )
-set_stmt.setParseAction(SetStmt)
+set_stmt.set_parse_action(SetStmt)
 
 subscript = single
 
@@ -710,18 +710,18 @@ plain_data_record = Group(
 
 tabular_record = (
     ":"
-    + OneOrMore(single).setResultsName("columns")
+    + OneOrMore(single).set_results_name("columns")
     + ":="
-    + OneOrMore(single | ".").setResultsName("data")
+    + OneOrMore(single | ".").set_results_name("data")
 )
-tabular_record.setParseAction(TabularRecord)
+tabular_record.set_parse_action(TabularRecord)
 
 tr_tabular_record = Suppress("(tr)") + tabular_record
-tr_tabular_record.setParseAction(mark_transposed)
+tr_tabular_record.set_parse_action(mark_transposed)
 
 param_slice_component = number | symbol | "*"
-param_slice_record = LBRACKET + delimitedList(param_slice_component) + RBRACKET
-param_slice_record.setParseAction(SliceRecord)
+param_slice_record = LBRACKET + DelimitedList(param_slice_component) + RBRACKET
+param_slice_record.set_parse_action(SliceRecord)
 
 param_record = (
     param_slice_record
@@ -731,38 +731,38 @@ param_record = (
     | Suppress(":=")
 )
 
-param_default = Optional(KW_DEFAULT + single.setResultsName("default"))
+param_default = Optional(KW_DEFAULT + single.set_results_name("default"))
 
 param_stmt = (
     KW_PARAM
     + ~KW_DEFAULT
-    + symbol.setResultsName("name")
+    + symbol.set_results_name("name")
     + param_default
-    + Group(OneOrMore(param_record)).setResultsName("records")
+    + Group(OneOrMore(param_record)).set_results_name("records")
     + END
 )
-param_stmt.setParseAction(ParamStmt)
+param_stmt.set_parse_action(ParamStmt)
 
 param_tabbing_stmt = (
     KW_PARAM
     + param_default
     + ":"
     + Optional(symbol + ": ")
-    + OneOrMore(data).setResultsName("params")
+    + OneOrMore(data).set_results_name("params")
     + ":="
-    + ZeroOrMore(single).setResultsName("data")
+    + ZeroOrMore(single).set_results_name("data")
     + END
 )
-param_tabbing_stmt.setParseAction(ParamTabbingStmt)
+param_tabbing_stmt.set_parse_action(ParamTabbingStmt)
 
 param_def_stmt = (
     KW_PARAM
-    + symbol.setResultsName("name")
+    + symbol.set_results_name("name")
     + Optional(subscript_domain)
     + param_default
     + END
 )
-param_def_stmt.setParseAction(ParamDefStmt)
+param_def_stmt.set_parse_action(ParamDefStmt)
 
 stmts = set_stmt | set_def_stmt | param_def_stmt | param_stmt | param_tabbing_stmt
 grammar = ZeroOrMore(stmts) + StringEnd()
@@ -820,7 +820,7 @@ class Amply(object):
         @param string string to parse
         """
         try:
-            for obj in grammar.parseString(string):
+            for obj in grammar.parse_string(string):
                 obj.eval(self)
         except ParseException as ex:
             print(string)
