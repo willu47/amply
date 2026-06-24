@@ -28,17 +28,17 @@ class TestSubscript:
         {r in REGION, y in YEAR, g in GOLF}
 
         """
-        success, result = subscript_domain.runTests(fixture)
+        success, result = subscript_domain.run_tests(fixture)
         assert success
 
         assert result[0]
 
     def test_subscript_result(self):
-        result = subscript_domain.parseString("{a, b, c}")
+        result = subscript_domain.parse_string("{a, b, c}")
         assert result.asDict() == {"subscripts": ["a", "b", "c"]}
 
     def test_subscript_result_domain(self):
-        result = subscript_domain.parseString("{a in A, b in B, c in C}")
+        result = subscript_domain.parse_string("{a in A, b in B, c in C}")
         assert result.asDict() == {"subscripts": ["A", "B", "C"]}
 
 
@@ -55,7 +55,7 @@ class TestNumber:
         Jan_01
         01_Jan
         """
-        result = number.runTests(fixture, failureTests=True)
+        result = number.run_tests(fixture, failureTests=True)
         assert result[0]
 
     def test_number(self):
@@ -68,7 +68,7 @@ class TestNumber:
         00
         0.0
         """
-        result = number.runTests(fixture)
+        result = number.run_tests(fixture)
         assert result[0]
 
 
@@ -80,7 +80,7 @@ class TestSymbol:
         +1e-049
         skj!adfk
         """
-        result = symbol.runTests(fixture, failureTests=True)
+        result = symbol.run_tests(fixture, failureTests=True)
         assert result[0]
 
     def test_symbol(self):
@@ -93,7 +93,7 @@ class TestSymbol:
 
         01_Jan
         """
-        result = symbol.runTests(fixture)
+        result = symbol.run_tests(fixture)
         assert result[0]
 
 
@@ -105,11 +105,11 @@ class TestParameter:
         param Test;
         param Test default 1;
         """
-        success, results = param_def_stmt.runTests(fixture)
+        success, results = param_def_stmt.run_tests(fixture)
 
         assert success
 
-        success, _ = param_stmt.runTests(fixture, failureTests=True)
+        success, _ = param_stmt.run_tests(fixture, failureTests=True)
         assert success
 
     def test_param_stmt(self):
@@ -127,10 +127,10 @@ class TestParameter:
         param 01_Feb := -0.04;
 
         """
-        result = param_stmt.runTests(fixture)
+        result = param_stmt.run_tests(fixture)
         assert result[0]
 
-        result = param_def_stmt.runTests(fixture, failureTests=True)
+        result = param_def_stmt.run_tests(fixture, failureTests=True)
         assert result[0]
 
 
@@ -143,7 +143,7 @@ class TestSet:
 
         set 1_2_month := 1 2 3 4;
         """
-        result = set_stmt.runTests(fixture)
+        result = set_stmt.run_tests(fixture)
         assert result[0]
 
     @pytest.fixture()
@@ -158,11 +158,11 @@ class TestSet:
         return fixture
 
     def test_set_record(self, setup):
-        result = set_record.runTests(setup)
+        result = set_record.run_tests(setup)
         assert result[0]
 
     def test_simple_data(self, setup):
-        result = simple_data.runTests(setup)
+        result = simple_data.run_tests(setup)
         assert result[0]
 
     def test_single(self):
@@ -173,7 +173,7 @@ class TestSet:
         Jan_01
         01_Jan
         """
-        result = single.runTests(fixture)
+        result = single.run_tests(fixture)
         assert result[0]
 
 
