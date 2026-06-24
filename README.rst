@@ -1,8 +1,9 @@
 Amply
 ======
 
-.. image:: https://travis-ci.com/willu47/amply.svg?branch=master
-    :target: https://travis-ci.com/willu47/amply
+.. image:: https://github.com/willu47/amply/actions/workflows/python-package.yml/badge.svg
+    :alt: Python package
+    :target: https://travis-ci.com/willu47/amply.svg?branch=master
 .. image:: https://img.shields.io/pypi/v/amply?style=plastic
      :alt: PyPI
      :target: https://pypi.org/project/amply/
